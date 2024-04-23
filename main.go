@@ -32,7 +32,7 @@ main:
 		case "exit":
 			fmt.Print("Exiting PokédexGO...")
 			break main
-		case "":
+		case "\n":
 			fmt.Print("Please enter the name or ID of a Pokémon!")
 		default:
 			url := fmt.Sprintf("https://pokeapi.co/api/v2/pokemon/%s", userInput)
@@ -49,11 +49,14 @@ main:
 			}
 			var responseObject Pokemon
 			json.Unmarshal(responseData, &responseObject)
-
-			fmt.Printf("Pokémon name is: %s\n", responseObject.Name)
-			fmt.Printf("Pokémon id is: %d\n", responseObject.ID)
-			fmt.Printf("Pokémon weighs: %.1f kg\n", responseObject.Weight*.1)
-			fmt.Printf("Link to Pokémon's sprite:\n%s", responseObject.Sprites.FrontDefault)
+			if responseObject.ID == 0 {
+				fmt.Print("Pokémon not found. Please try again...\n")
+			} else {
+				fmt.Printf("Pokémon name is: %s\n", responseObject.Name)
+				fmt.Printf("Pokémon id is: %d\n", responseObject.ID)
+				fmt.Printf("Pokémon weighs: %.1f kg\n", responseObject.Weight*.1)
+				fmt.Printf("Link to Pokémon's sprite:\n%s", responseObject.Sprites.FrontDefault)
+			}
 		}
 	}
 }
