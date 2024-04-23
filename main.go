@@ -27,13 +27,13 @@ main:
 	for {
 		var userInput string
 		fmt.Print("Please input a Pokémon name or id: ")
-		fmt.Scan(&userInput)
+		fmt.Scanln(&userInput)
 		switch userInput {
 		case "exit":
 			fmt.Print("Exiting PokédexGO...")
 			break main
-		case "\n":
-			fmt.Print("Please enter the name or ID of a Pokémon!")
+		case "":
+			fmt.Print("Please enter the name or ID of a Pokémon!\n")
 		default:
 			url := fmt.Sprintf("https://pokeapi.co/api/v2/pokemon/%s", userInput)
 			response, err := http.Get(url)
