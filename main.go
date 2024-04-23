@@ -23,27 +23,37 @@ type Sprites struct {
 }
 
 func main() {
-	var userInput string
-	fmt.Print("Please input a Pokémon name or id: ")
-	fmt.Scan(&userInput)
-	url := fmt.Sprintf("https://pokeapi.co/api/v2/pokemon/%s", userInput)
-	response, err := http.Get(url)
+main:
+	for {
+		var userInput string
+		fmt.Print("Please input a Pokémon name or id: ")
+		fmt.Scan(&userInput)
+		switch userInput {
+		case "exit":
+			fmt.Print("Exiting PokédexGO...")
+			break main
+		case "":
+			fmt.Print("Please enter the name or ID of a Pokémon!")
+		default:
+			url := fmt.Sprintf("https://pokeapi.co/api/v2/pokemon/%s", userInput)
+			response, err := http.Get(url)
 
-	if err != nil {
-		fmt.Print(err.Error())
-		os.Exit(1)
+			if err != nil {
+				fmt.Print(err.Error())
+				os.Exit(1)
+			}
+
+			responseData, err := ioutil.ReadAll(response.Body)
+			if err != nil {
+				log.Fatal(err)
+			}
+			var responseObject Pokemon
+			json.Unmarshal(responseData, &responseObject)
+
+			fmt.Printf("Pokémon name is: %s\n", responseObject.Name)
+			fmt.Printf("Pokémon id is: %d\n", responseObject.ID)
+			fmt.Printf("Pokémon weighs: %.1f kg\n", responseObject.Weight*.1)
+			fmt.Printf("Link to Pokémon's sprite:\n%s", responseObject.Sprites.FrontDefault)
+		}
 	}
-
-	responseData, err := ioutil.ReadAll(response.Body)
-	if err != nil {
-		log.Fatal(err)
-	}
-	var responseObject Pokemon
-	json.Unmarshal(responseData, &responseObject)
-
-	fmt.Printf("Pokémon name is: %s\n", responseObject.Name)
-	fmt.Printf("Pokémon id is: %d\n", responseObject.ID)
-	fmt.Printf("Pokémon weighs: %.1f kg\n", responseObject.Weight*.1)
-	fmt.Printf("Link to Pokémon's sprite:\n%s", responseObject.Sprites.FrontDefault)
-
 }
