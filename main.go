@@ -55,7 +55,7 @@ main:
 				fmt.Printf("Pokémon name is: %s\n", responseObject.Name)
 				fmt.Printf("Pokémon id is: %d\n", responseObject.ID)
 				fmt.Printf("Pokémon weighs: %.1f kg\n", responseObject.Weight*.1)
-				fmt.Printf("Link to Pokémon's sprite:\n%s", responseObject.Sprites.FrontDefault)
+				fmt.Printf("Link to Pokémon's sprite:\n%s\n", responseObject.Sprites.FrontDefault)
 			}
 		}
 	}
