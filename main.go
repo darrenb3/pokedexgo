@@ -3,7 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"log"
 	"net/http"
 	"os"
@@ -64,7 +64,7 @@ main:
 				os.Exit(1)
 			}
 
-			responseData, err := ioutil.ReadAll(response.Body)
+			responseData, err := io.ReadAll(response.Body)
 			if err != nil {
 				log.Fatal(err)
 			}
