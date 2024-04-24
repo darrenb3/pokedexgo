@@ -7,6 +7,9 @@ import (
 	"log"
 	"net/http"
 	"os"
+
+	"github.com/charmbracelet/lipgloss"
+	"github.com/charmbracelet/lipgloss/table"
 )
 
 // A Response struct to map the Pokemon's data to
@@ -15,6 +18,14 @@ type Pokemon struct {
 	ID      int     `json:"id"`
 	Weight  float64 `json:"weight"`
 	Sprites Sprites `json:"sprites"`
+	Stats   []struct {
+		BaseStat int `json:"base_stat"`
+		Effort   int `json:"effort"`
+		Stat     struct {
+			Name string `json:"name"`
+			URL  string `json:"url"`
+		} `json:"stat"`
+	} `json:"stats"`
 }
 
 // Struct to map sprites of the pokemon
@@ -22,18 +33,28 @@ type Sprites struct {
 	FrontDefault string `json:"front_default"`
 }
 
+// Style definitons
+var textStyle = lipgloss.NewStyle().
+	Foreground(lipgloss.Color("#7D56F4"))
+
+var tableTextStyle = lipgloss.NewStyle().
+	Foreground(lipgloss.Color("#ffa6c9")).PaddingLeft(1).PaddingRight(1)
+
+var warnStyle = lipgloss.NewStyle().
+	Foreground(lipgloss.Color("#CD5C5C"))
+
 func main() {
 main:
 	for {
 		var userInput string
-		fmt.Print("Please input a Pokémon name or id: ")
+		fmt.Println(textStyle.Render("Please input a Pokémon name or id: "))
 		fmt.Scanln(&userInput)
 		switch userInput {
 		case "exit":
 			fmt.Print("Exiting PokédexGO...")
 			break main
 		case "":
-			fmt.Print("Please enter the name or ID of a Pokémon!\n")
+			fmt.Println(warnStyle.Render("Please enter the name or ID of a Pokémon!"))
 		default:
 			url := fmt.Sprintf("https://pokeapi.co/api/v2/pokemon/%s", userInput)
 			response, err := http.Get(url)
@@ -50,12 +71,32 @@ main:
 			var responseObject Pokemon
 			json.Unmarshal(responseData, &responseObject)
 			if responseObject.ID == 0 {
-				fmt.Print("Pokémon not found. Please try again...\n")
+				fmt.Println(warnStyle.Render("Pokémon not found. Please try again..."))
 			} else {
-				fmt.Printf("Pokémon name is: %s\n", responseObject.Name)
-				fmt.Printf("Pokémon id is: %d\n", responseObject.ID)
-				fmt.Printf("Pokémon weighs: %.1f kg\n", responseObject.Weight*.1)
-				fmt.Printf("Link to Pokémon's sprite:\n%s\n", responseObject.Sprites.FrontDefault)
+				var stats []int
+				for _, stat := range responseObject.Stats {
+					stats = append(stats, stat.BaseStat)
+				}
+				rows := [][]string{
+					{"Name:", responseObject.Name},
+					{"ID:", fmt.Sprintf("%d", responseObject.ID)},
+					{"HP:", fmt.Sprintf("%d", stats[0])},
+					{"Attack:", fmt.Sprintf("%d", stats[1])},
+					{"Defense:", fmt.Sprintf("%d", stats[2])},
+					{"Sp. Atk:", fmt.Sprintf("%d", stats[3])},
+					{"Sp. Def:", fmt.Sprintf("%d", stats[4])},
+					{"Speed:", fmt.Sprintf("%d", stats[5])},
+					//
+				}
+
+				t := table.New().
+					Border(lipgloss.NormalBorder()).
+					BorderStyle(lipgloss.NewStyle().Foreground(lipgloss.Color("99"))).
+					StyleFunc(func(row, col int) lipgloss.Style {
+						return tableTextStyle
+					}).
+					Rows(rows...)
+				fmt.Println(t)
 			}
 		}
 	}
