@@ -57,6 +57,7 @@ main:
 		var userInput string
 		fmt.Println(textStyle.Render("Please input a Pokémon name or id: "))
 		fmt.Scanln(&userInput)
+		userInput = strings.ToLower(userInput)
 		switch userInput {
 		case "exit":
 			fmt.Print("Exiting PokédexGO...")
