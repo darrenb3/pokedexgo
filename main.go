@@ -103,9 +103,9 @@ main:
 				//Checking if pokemon has 2 types or not: If yes combines them into a single string
 				var finalType string
 				if len(types) == 2 {
-					finalType = strings.Join(types, " ")
+					finalType = strings.ToUpper(strings.Join(types, " "))
 				} else {
-					finalType = types[0]
+					finalType = strings.ToUpper(types[0])
 				}
 				rows := [][]string{
 					{"Name:", upperFirstLetter(responseObject.Name)},
