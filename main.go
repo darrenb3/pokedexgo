@@ -7,6 +7,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strings"
 
 	"github.com/charmbracelet/lipgloss"
 	"github.com/charmbracelet/lipgloss/table"
@@ -26,6 +27,13 @@ type Pokemon struct {
 			URL  string `json:"url"`
 		} `json:"stat"`
 	} `json:"stats"`
+	Types []struct {
+		Slot int `json:"slot"`
+		Type struct {
+			Name string `json:"name"`
+			URL  string `json:"url"`
+		} `json:"type"`
+	} `json:"types"`
 }
 
 // Struct to map sprites of the pokemon
@@ -74,12 +82,26 @@ main:
 				fmt.Println(warnStyle.Render("Pokémon not found. Please try again..."))
 			} else {
 				var stats []int
+				var types []string
+				//Mapping all stats to a slice
 				for _, stat := range responseObject.Stats {
 					stats = append(stats, stat.BaseStat)
+				}
+				//Mapping all types to a slice
+				for _, pTypes := range responseObject.Types {
+					types = append(types, pTypes.Type.Name)
+				}
+				//Checking if pokemon has 2 types or not: If yes combines them into a single string
+				var finalType string
+				if len(types) == 2 {
+					finalType = strings.Join(types, " ")
+				} else {
+					finalType = types[0]
 				}
 				rows := [][]string{
 					{"Name:", responseObject.Name},
 					{"ID:", fmt.Sprintf("%d", responseObject.ID)},
+					{"Type(s):", finalType},
 					{"HP:", fmt.Sprintf("%d", stats[0])},
 					{"Attack:", fmt.Sprintf("%d", stats[1])},
 					{"Defense:", fmt.Sprintf("%d", stats[2])},
