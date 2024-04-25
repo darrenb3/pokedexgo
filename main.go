@@ -51,6 +51,14 @@ var tableTextStyle = lipgloss.NewStyle().
 var warnStyle = lipgloss.NewStyle().
 	Foreground(lipgloss.Color("#CD5C5C"))
 
+// makes the first letter of an ascii string uppercase
+func upperFirstLetter(s string) string {
+	letter := string(s[0])
+	uppperLetter := strings.ToUpper(letter)
+	newString := strings.Replace(s, letter, uppperLetter, 1)
+	return newString
+}
+
 func main() {
 main:
 	for {
@@ -100,7 +108,7 @@ main:
 					finalType = types[0]
 				}
 				rows := [][]string{
-					{"Name:", responseObject.Name},
+					{"Name:", upperFirstLetter(responseObject.Name)},
 					{"ID:", fmt.Sprintf("%d", responseObject.ID)},
 					{"Type(s):", finalType},
 					{"HP:", fmt.Sprintf("%d", stats[0])},
