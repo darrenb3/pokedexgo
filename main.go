@@ -15,11 +15,10 @@ import (
 
 // A Response struct to map the Pokemon's data to
 type Pokemon struct {
-	Name    string  `json:"name"`
-	ID      int     `json:"id"`
-	Weight  float64 `json:"weight"`
-	Sprites Sprites `json:"sprites"`
-	Stats   []struct {
+	Name   string  `json:"name"`
+	ID     int     `json:"id"`
+	Weight float64 `json:"weight"`
+	Stats  []struct {
 		BaseStat int `json:"base_stat"`
 		Effort   int `json:"effort"`
 		Stat     struct {
@@ -34,6 +33,9 @@ type Pokemon struct {
 			URL  string `json:"url"`
 		} `json:"type"`
 	} `json:"types"`
+	Sprites struct {
+		FrontDefault string `json:"front_default"`
+	}
 }
 
 // Struct to map sprites of the pokemon
@@ -107,6 +109,7 @@ main:
 				} else {
 					finalType = strings.ToUpper(types[0])
 				}
+
 				rows := [][]string{
 					{"Name:", upperFirstLetter(responseObject.Name)},
 					{"ID:", fmt.Sprintf("%d", responseObject.ID)},
@@ -117,7 +120,6 @@ main:
 					{"Sp. Atk:", fmt.Sprintf("%d", stats[3])},
 					{"Sp. Def:", fmt.Sprintf("%d", stats[4])},
 					{"Speed:", fmt.Sprintf("%d", stats[5])},
-					//
 				}
 
 				t := table.New().
@@ -127,7 +129,12 @@ main:
 						return tableTextStyle
 					}).
 					Rows(rows...)
+
+				//Making clickable link to sprite
+				spriteLink := textStyle.Render(fmt.Sprintf("\x1b]8;;%s\x07Link to Pokemon's sprite\x1b]8;;\x07\u001b[0m", responseObject.Sprites.FrontDefault))
+
 				fmt.Println(t)
+				fmt.Println(spriteLink)
 			}
 		}
 	}
