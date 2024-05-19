@@ -9,8 +9,13 @@ import (
 	"os"
 	"strings"
 
+	_ "image/jpeg"
+	_ "image/png"
+
+	"github.com/cavaliergopher/grab/v3"
 	"github.com/charmbracelet/lipgloss"
 	"github.com/charmbracelet/lipgloss/table"
+	"github.com/qeesung/image2ascii/convert"
 )
 
 // A Response struct to map the Pokemon's data to
@@ -59,6 +64,21 @@ func upperFirstLetter(s string) string {
 	uppperLetter := strings.ToUpper(letter)
 	newString := strings.Replace(s, letter, uppperLetter, 1)
 	return newString
+}
+
+// Downloads the sprite from the api url linked and then converts it to ascii art for display in tui
+func imageArt(spriteURL string) string {
+
+	//downloading image from url
+	resp, err := grab.Get(".", spriteURL)
+	if err != nil {
+		log.Fatal(err)
+	}
+	convertOptions := convert.DefaultOptions
+	converter := convert.NewImageConverter()
+	image := converter.ImageFile2ASCIIString(resp.Filename, &convertOptions)
+	os.Remove(resp.Filename)
+	return image
 }
 
 func main() {
@@ -133,6 +153,8 @@ main:
 				//Making clickable link to sprite
 				spriteLink := textStyle.Render(fmt.Sprintf("\x1b]8;;%s\x07Link to Pokemon's sprite\x1b]8;;\x07\u001b[0m", responseObject.Sprites.FrontDefault))
 
+				//Printing Pokemon's info
+				fmt.Print(imageArt(responseObject.Sprites.FrontDefault))
 				fmt.Println(t)
 				fmt.Println(spriteLink)
 			}
