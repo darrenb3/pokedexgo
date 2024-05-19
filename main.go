@@ -66,7 +66,7 @@ func upperFirstLetter(s string) string {
 	return newString
 }
 
-// Downloads the sprite from the api url linked and then converts it to ascii art for display in tui
+// Downloads the image from the api url linked and then converts it to ascii art for display in tui
 func imageArt(spriteURL string) string {
 
 	//downloading image from url
@@ -75,10 +75,25 @@ func imageArt(spriteURL string) string {
 		log.Fatal(err)
 	}
 	convertOptions := convert.DefaultOptions
+	convertOptions.FitScreen = true
 	converter := convert.NewImageConverter()
 	image := converter.ImageFile2ASCIIString(resp.Filename, &convertOptions)
 	os.Remove(resp.Filename)
-	return image
+
+	//Cleaning the ascii art image to remove the png transparency padding that is added on conversion
+	var newImage []string
+	temp := strings.Split(image, "\n")
+	for _, lineContent := range temp {
+		line := strings.ReplaceAll(lineContent, "\x1b[0;00m", " ")
+		line = strings.ReplaceAll(line, "\x1b[38;5;16m", " ")
+		line = strings.TrimSpace(line)
+		if line == "" {
+			continue
+		} else {
+			newImage = append(newImage, lineContent)
+		}
+	}
+	return strings.Join(newImage, "\n")
 }
 
 func main() {
@@ -151,10 +166,10 @@ main:
 					Rows(rows...)
 
 				//Making clickable link to sprite
-				spriteLink := textStyle.Render(fmt.Sprintf("\x1b]8;;%s\x07Link to Pokemon's sprite\x1b]8;;\x07\u001b[0m", responseObject.Sprites.FrontDefault))
+				spriteLink := textStyle.Render(fmt.Sprintf("\x1b]8;;https://www.serebii.net/pokemon/%s\x07Link to Pokemon's Serebii.net entry\x1b]8;;\x07\u001b[0m", responseObject.Name))
 
 				//Printing Pokemon's info
-				fmt.Print(imageArt(responseObject.Sprites.FrontDefault))
+				fmt.Println(imageArt(responseObject.Sprites.FrontDefault))
 				fmt.Println(t)
 				fmt.Println(spriteLink)
 			}
