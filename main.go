@@ -1,6 +1,7 @@
 package main
 
 import (
+	"database/sql"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -12,11 +13,15 @@ import (
 	_ "image/jpeg"
 	_ "image/png"
 
+	_ "modernc.org/sqlite"
+
 	"github.com/cavaliergopher/grab/v3"
 	"github.com/charmbracelet/lipgloss"
 	"github.com/charmbracelet/lipgloss/table"
 	"github.com/qeesung/image2ascii/convert"
 )
+
+const database string = "pokemon.db"
 
 // A Response struct to map the Pokemon's data to
 type Pokemon struct {
@@ -96,9 +101,41 @@ func imageArt(spriteURL string) string {
 	return strings.Join(newImage, "\n")
 }
 
+func createDatabase(db *sql.DB) error {
+	query := `CREATE TABLE IF NOT EXISTS pokemon (id INT PRIMARY KEY, name STRING, type STRING, hp INT, attack INT, defense INT, sp_atk INT, sp_def INT, speed INT)`
+	if _, err := db.Exec(query); err != nil {
+		fmt.Println("Error in table create")
+		return err
+	}
+	return nil
+}
+
+func insertDatabase(db *sql.DB, pID int, pName string, pType string, stats []int) error {
+	query := `INSERT INTO POKEMON (id, name, type, hp, attack, defense, sp_atk, sp_def, speed) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)`
+	if _, err := db.Exec(query, pID, pName, pType, stats[0], stats[1], stats[2], stats[3], stats[4], stats[5]); err != nil {
+		fmt.Println("Error in pokemon insert")
+		return err
+	}
+	return nil
+}
+
 func main() {
-main:
+	db, err := sql.Open("sqlite", database)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	if err = createDatabase(db); err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	should_exit := false
+
 	for {
+		if should_exit {
+			break
+		}
 		var userInput string
 		fmt.Println(textStyle.Render("Please input a Pokémon name or id: "))
 		fmt.Scanln(&userInput)
@@ -106,7 +143,7 @@ main:
 		switch userInput {
 		case "exit":
 			fmt.Print("Exiting PokédexGO...")
-			break main
+			should_exit = true
 		case "":
 			fmt.Println(warnStyle.Render("Please enter the name or ID of a Pokémon!"))
 		default:
@@ -172,6 +209,9 @@ main:
 				fmt.Println(imageArt(responseObject.Sprites.FrontDefault))
 				fmt.Println(t)
 				fmt.Println(spriteLink)
+				if err = insertDatabase(db, responseObject.ID, upperFirstLetter(responseObject.Name), finalType, stats); err != nil {
+					fmt.Println(err)
+				}
 			}
 		}
 	}
