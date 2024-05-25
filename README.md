@@ -5,3 +5,4 @@ PokédexGO is a basic pokedex written in GO. It uses [Pokéapi](https://pokeapi.
 Below are links to the projects that PokedexGO depends on:
 - [Lip Gloss](https://github.com/charmbracelet/lipgloss)
 - [image2ascii](https://github.com/qeesung/image2ascii)
+- [sqlite](https://pkg.go.dev/modernc.org/sqlite)
