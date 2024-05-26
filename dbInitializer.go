@@ -1,4 +1,4 @@
-package dbInitializer
+package main
 
 import (
 	"database/sql"
@@ -66,7 +66,7 @@ func createDatabase(db *sql.DB) error {
 }
 
 func getAllPokemon() allPokemon {
-	url := fmt.Sprintf("https://pokeapi.co/api/v2/pokemon?limit=100000&offset=0")
+	url := "https://pokeapi.co/api/v2/pokemon?limit=100000&offset=0"
 	response, err := http.Get(url)
 
 	if err != nil {
