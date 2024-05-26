@@ -126,7 +126,7 @@ func addPokemonToDatabase(db *sql.DB, urls []string) error {
 			finalType = strings.ToUpper(types[0])
 		}
 		var pokemonData []string
-		pokemonData = append(pokemonData, upperFirstLetter(responseObject.Name), fmt.Sprintf("%d", responseObject.ID), finalType, fmt.Sprintf("%d", stats[0]), fmt.Sprintf("%d", stats[1]), fmt.Sprintf("%d", stats[2]), fmt.Sprintf("%d", stats[3]), fmt.Sprintf("%d", stats[4]), fmt.Sprintf("%d", stats[5]))
+		pokemonData = append(pokemonData, fmt.Sprintf("%d", responseObject.ID), upperFirstLetter(responseObject.Name), finalType, fmt.Sprintf("%d", stats[0]), fmt.Sprintf("%d", stats[1]), fmt.Sprintf("%d", stats[2]), fmt.Sprintf("%d", stats[3]), fmt.Sprintf("%d", stats[4]), fmt.Sprintf("%d", stats[5]))
 		query := `INSERT INTO POKEMON (id, name, type, hp, attack, defense, sp_atk, sp_def, speed) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)`
 		if _, err := db.Exec(query, pokemonData[0], pokemonData[1], pokemonData[2], pokemonData[3], pokemonData[4], pokemonData[5], pokemonData[6], pokemonData[7], pokemonData[8]); err != nil {
 			fmt.Println("Error in pokemon insert")
