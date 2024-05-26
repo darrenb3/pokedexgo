@@ -20,15 +20,16 @@ import (
 const database string = "pokemon.db"
 
 type pokemonStruct struct {
-	Id      int
-	Name    string
-	Types   string
-	Hp      int
-	Attack  int
-	Defense int
-	Sp_atk  int
-	Sp_def  int
-	Speed   int
+	Id         int
+	Name       string
+	Types      string
+	Hp         int
+	Attack     int
+	Defense    int
+	Sp_atk     int
+	Sp_def     int
+	Speed      int
+	Sprite_URL string
 }
 
 // Struct to map sprites of the pokemon
@@ -132,7 +133,7 @@ func main() {
 			var pokemon pokemonStruct
 			query := `SELECT * FROM pokemon WHERE name LIKE ? limit 1`
 			row := db.QueryRow(query, userInput)
-			if err = row.Scan(&pokemon.Id, &pokemon.Name, &pokemon.Types, &pokemon.Hp, &pokemon.Attack, &pokemon.Defense, &pokemon.Sp_atk, &pokemon.Sp_def, &pokemon.Speed); err == sql.ErrNoRows {
+			if err = row.Scan(&pokemon.Id, &pokemon.Name, &pokemon.Types, &pokemon.Hp, &pokemon.Attack, &pokemon.Defense, &pokemon.Sp_atk, &pokemon.Sp_def, &pokemon.Speed, &pokemon.Sprite_URL); err == sql.ErrNoRows {
 				log.Printf("Pokemon not found")
 				continue
 			} else if err != nil {
@@ -163,12 +164,10 @@ func main() {
 			spriteLink := textStyle.Render(fmt.Sprintf("\x1b]8;;https://www.serebii.net/pokemon/%s\x07Link to Pokemon's Serebii.net entry\x1b]8;;\x07\u001b[0m", pokemon.Name))
 
 			//Printing Pokemon's info
-			//fmt.Println(imageArt(responseObject.Sprites.FrontDefault))
+			fmt.Println(imageArt(pokemon.Sprite_URL))
 			fmt.Println(t)
 			fmt.Println(spriteLink)
-			//if err = insertDatabase(db, responseObject.ID, upperFirstLetter(responseObject.Name), finalType, stats); err != nil {
-			//	fmt.Println(err)
-			//}
+
 		}
 	}
 }
