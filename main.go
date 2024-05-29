@@ -118,8 +118,8 @@ func main() {
 			fmt.Println(warnStyle.Render("Please enter the name or ID of a Pokémon!"))
 		default:
 			var pokemon pokemonStruct
-			query := `SELECT * FROM pokemon WHERE name LIKE ? limit 1`
-			row := db.QueryRow(query, userInput)
+			query := `SELECT * FROM pokemon WHERE name LIKE ? or id =  ? limit 1`
+			row := db.QueryRow(query, userInput, userInput)
 			if err = row.Scan(&pokemon.Id, &pokemon.Name, &pokemon.Types, &pokemon.Hp, &pokemon.Attack, &pokemon.Defense, &pokemon.Sp_atk, &pokemon.Sp_def, &pokemon.Speed, &pokemon.Sprite_URL); err == sql.ErrNoRows {
 				log.Printf("Pokemon not found")
 				continue
