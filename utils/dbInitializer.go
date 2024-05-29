@@ -13,6 +13,7 @@ import (
 	_ "modernc.org/sqlite"
 )
 
+// Struct for holding response of all pokemon query
 type allPokemon struct {
 	Count    int `json:"count"`
 	Next     any `json:"next"`
@@ -24,7 +25,7 @@ type allPokemon struct {
 }
 
 // A Response struct to map the Pokemon's data to
-type Pokemon struct {
+type pokemonReponse struct {
 	Name   string  `json:"name"`
 	ID     int     `json:"id"`
 	Weight float64 `json:"weight"`
@@ -106,7 +107,7 @@ func addPokemonToDatabase(db *sql.DB, urls []string) error {
 		if err != nil {
 			log.Fatal(err)
 		}
-		var responseObject Pokemon
+		var responseObject pokemonReponse
 		json.Unmarshal(responseData, &responseObject)
 		var stats []int
 		var types []string
