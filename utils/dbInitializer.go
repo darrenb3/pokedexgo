@@ -92,7 +92,6 @@ func addPokemonToDatabase(db *sql.DB, urls []string) error {
 			finalType = strings.ToUpper(types[0])
 		}
 		pokemon := common.Pokemon{Id: responseObject.ID, Name: upperFirstLetter(responseObject.Name), Types: finalType, Hp: stats[0], Attack: stats[1], Defense: stats[2], Sp_atk: stats[3], Sp_def: stats[4], Speed: stats[5], Sprite_URL: responseObject.Sprites.FrontDefault}
-		//pokemonData = append(pokemonData, fmt.Sprintf("%d", responseObject.ID), upperFirstLetter(responseObject.Name), finalType, fmt.Sprintf("%d", stats[0]), fmt.Sprintf("%d", stats[1]), fmt.Sprintf("%d", stats[2]), fmt.Sprintf("%d", stats[3]), fmt.Sprintf("%d", stats[4]), fmt.Sprintf("%d", stats[5]), responseObject.Sprites.FrontDefault)
 		query := `INSERT INTO POKEMON (id, name, type, hp, attack, defense, sp_atk, sp_def, speed, sprite_url) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
 		if _, err := db.Exec(query, pokemon.Id, pokemon.Name, pokemon.Types, pokemon.Hp, pokemon.Attack, pokemon.Defense, pokemon.Sp_atk, pokemon.Sp_def, pokemon.Speed, pokemon.Sprite_URL); err != nil {
 			fmt.Println("Error in pokemon insert")
