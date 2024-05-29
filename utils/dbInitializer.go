@@ -8,46 +8,11 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"pokedexgo/common"
 	"strings"
 
 	_ "modernc.org/sqlite"
 )
-
-// Struct for holding response of all pokemon query
-type allPokemon struct {
-	Count    int `json:"count"`
-	Next     any `json:"next"`
-	Previous any `json:"previous"`
-	Results  []struct {
-		Name string `json:"name"`
-		URL  string `json:"url"`
-	} `json:"results"`
-}
-
-// A Response struct to map the Pokemon's data to
-type pokemonReponse struct {
-	Name   string  `json:"name"`
-	ID     int     `json:"id"`
-	Weight float64 `json:"weight"`
-	Stats  []struct {
-		BaseStat int `json:"base_stat"`
-		Effort   int `json:"effort"`
-		Stat     struct {
-			Name string `json:"name"`
-			URL  string `json:"url"`
-		} `json:"stat"`
-	} `json:"stats"`
-	Types []struct {
-		Slot int `json:"slot"`
-		Type struct {
-			Name string `json:"name"`
-			URL  string `json:"url"`
-		} `json:"type"`
-	} `json:"types"`
-	Sprites struct {
-		FrontDefault string `json:"front_default"`
-	}
-}
 
 // makes the first letter of an ascii string uppercase
 func upperFirstLetter(s string) string {
@@ -66,7 +31,7 @@ func createDatabase(db *sql.DB) error {
 	return nil
 }
 
-func getAllPokemon() allPokemon {
+func getAllPokemon() common.AllPokemon {
 	url := "https://pokeapi.co/api/v2/pokemon?limit=100000&offset=0"
 	response, err := http.Get(url)
 
@@ -80,13 +45,13 @@ func getAllPokemon() allPokemon {
 		log.Fatal(err)
 	}
 
-	var responseObject allPokemon
+	var responseObject common.AllPokemon
 	json.Unmarshal(responseData, &responseObject)
 
 	return responseObject
 }
 
-func getPokemonUrl(allPokemon allPokemon) []string {
+func getPokemonUrl(allPokemon common.AllPokemon) []string {
 	var urls []string
 	for _, result := range allPokemon.Results {
 		urls = append(urls, result.URL)
@@ -107,7 +72,7 @@ func addPokemonToDatabase(db *sql.DB, urls []string) error {
 		if err != nil {
 			log.Fatal(err)
 		}
-		var responseObject pokemonReponse
+		var responseObject common.PokemonReponse
 		json.Unmarshal(responseData, &responseObject)
 		var stats []int
 		var types []string
@@ -126,10 +91,10 @@ func addPokemonToDatabase(db *sql.DB, urls []string) error {
 		} else {
 			finalType = strings.ToUpper(types[0])
 		}
-		var pokemonData []string
-		pokemonData = append(pokemonData, fmt.Sprintf("%d", responseObject.ID), upperFirstLetter(responseObject.Name), finalType, fmt.Sprintf("%d", stats[0]), fmt.Sprintf("%d", stats[1]), fmt.Sprintf("%d", stats[2]), fmt.Sprintf("%d", stats[3]), fmt.Sprintf("%d", stats[4]), fmt.Sprintf("%d", stats[5]), responseObject.Sprites.FrontDefault)
+		pokemon := common.Pokemon{Id: responseObject.ID, Name: upperFirstLetter(responseObject.Name), Types: finalType, Hp: stats[0], Attack: stats[1], Defense: stats[2], Sp_atk: stats[3], Sp_def: stats[4], Speed: stats[5], Sprite_URL: responseObject.Sprites.FrontDefault}
+		//pokemonData = append(pokemonData, fmt.Sprintf("%d", responseObject.ID), upperFirstLetter(responseObject.Name), finalType, fmt.Sprintf("%d", stats[0]), fmt.Sprintf("%d", stats[1]), fmt.Sprintf("%d", stats[2]), fmt.Sprintf("%d", stats[3]), fmt.Sprintf("%d", stats[4]), fmt.Sprintf("%d", stats[5]), responseObject.Sprites.FrontDefault)
 		query := `INSERT INTO POKEMON (id, name, type, hp, attack, defense, sp_atk, sp_def, speed, sprite_url) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
-		if _, err := db.Exec(query, pokemonData[0], pokemonData[1], pokemonData[2], pokemonData[3], pokemonData[4], pokemonData[5], pokemonData[6], pokemonData[7], pokemonData[8], pokemonData[9]); err != nil {
+		if _, err := db.Exec(query, pokemon.Id, pokemon.Name, pokemon.Types, pokemon.Hp, pokemon.Attack, pokemon.Defense, pokemon.Sp_atk, pokemon.Sp_def, pokemon.Speed, pokemon.Sprite_URL); err != nil {
 			fmt.Println("Error in pokemon insert")
 			return err
 		}
