@@ -139,7 +139,7 @@ func addPokemonToDatabase(db *sql.DB, urls []string) error {
 }
 
 func DbInitialize() error {
-	const database string = "pokemon.db"
+	var database string = "pokemon.db"
 	db, err := sql.Open("sqlite", database)
 	if err != nil {
 		fmt.Println(err)
