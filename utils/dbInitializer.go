@@ -1,4 +1,4 @@
-package main
+package utils
 
 import (
 	"database/sql"
@@ -134,5 +134,21 @@ func addPokemonToDatabase(db *sql.DB, urls []string) error {
 		}
 
 	}
+	return nil
+}
+
+func DbInitialize() error {
+	const database string = "pokemon.db"
+	db, err := sql.Open("sqlite", database)
+	if err != nil {
+		fmt.Println(err)
+	}
+	if err = createDatabase(db); err != nil {
+		fmt.Println(err)
+	}
+	createDatabase(db)
+	pokemons := getAllPokemon()
+	pokemonURLS := getPokemonUrl(pokemons)
+	addPokemonToDatabase(db, pokemonURLS)
 	return nil
 }

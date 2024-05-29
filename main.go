@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"pokedexgo/utils"
 	"strings"
 
 	_ "image/jpeg"
@@ -83,17 +84,7 @@ func checkDbExistence() error {
 	} else {
 		log.Printf("Database not created...\n")
 		log.Printf("Creating Database...\n")
-		db, err := sql.Open("sqlite", database)
-		if err != nil {
-			fmt.Println(err)
-		}
-		if err = createDatabase(db); err != nil {
-			fmt.Println(err)
-		}
-		createDatabase(db)
-		pokemons := getAllPokemon()
-		pokemonURLS := getPokemonUrl(pokemons)
-		addPokemonToDatabase(db, pokemonURLS)
+		utils.DbInitialize()
 	}
 	return nil
 }
@@ -105,10 +96,6 @@ func main() {
 	//Database connection
 	db, err := sql.Open("sqlite", database)
 	if err != nil {
-		fmt.Println(err)
-		return
-	}
-	if err = createDatabase(db); err != nil {
 		fmt.Println(err)
 		return
 	}
@@ -141,7 +128,7 @@ func main() {
 				continue
 			}
 			rows := [][]string{
-				{"Name:", upperFirstLetter(pokemon.Name)},
+				{"Name:", pokemon.Name},
 				{"ID:", fmt.Sprintf("%d", pokemon.Id)},
 				{"Type(s):", pokemon.Types},
 				{"HP:", fmt.Sprintf("%d", pokemon.Hp)},
