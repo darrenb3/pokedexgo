@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"pokedexgo/common"
 	"pokedexgo/utils"
 	"strings"
 
@@ -19,19 +20,6 @@ import (
 )
 
 const database string = "pokemon.db"
-
-type pokemonStruct struct {
-	Id         int
-	Name       string
-	Types      string
-	Hp         int
-	Attack     int
-	Defense    int
-	Sp_atk     int
-	Sp_def     int
-	Speed      int
-	Sprite_URL string
-}
 
 // Struct to map sprites of the pokemon
 type Sprites struct {
@@ -117,7 +105,7 @@ func main() {
 		case "":
 			fmt.Println(warnStyle.Render("Please enter the name or ID of a Pokémon!"))
 		default:
-			var pokemon pokemonStruct
+			var pokemon common.Pokemon
 			query := `SELECT * FROM pokemon WHERE name LIKE ? or id =  ? limit 1`
 			row := db.QueryRow(query, userInput, userInput)
 			if err = row.Scan(&pokemon.Id, &pokemon.Name, &pokemon.Types, &pokemon.Hp, &pokemon.Attack, &pokemon.Defense, &pokemon.Sp_atk, &pokemon.Sp_def, &pokemon.Speed, &pokemon.Sprite_URL); err == sql.ErrNoRows {
