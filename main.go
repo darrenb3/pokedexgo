@@ -21,11 +21,6 @@ import (
 
 const database string = "pokemon.db"
 
-// Struct to map sprites of the pokemon
-type Sprites struct {
-	FrontDefault string `json:"front_default"`
-}
-
 // Style definitons
 var textStyle = lipgloss.NewStyle().
 	Foreground(lipgloss.Color("#7D56F4"))
